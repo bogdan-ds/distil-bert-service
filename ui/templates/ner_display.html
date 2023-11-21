@@ -1,0 +1,70 @@
+<!-- templates/ner_display.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NER Results</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .main-container {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 10px 3px #aaa;
+            width: 80%;
+            text-align: left;
+        }
+        .entity {
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            margin: 0.25rem;
+            display: inline-flex;
+            position: relative;
+            box-shadow: 0px 0px 2px 1px #fff;
+        }
+        .B-ORG { background-color: lightblue; }
+        .I-ORG { background-color: lightblue; }
+        .B-PER { background-color: lightgreen; }
+        .I-PER { background-color: lightgreen; }
+        .B-LOC { background-color: coral; }
+        .I-LOC { background-color: coral; }
+        .B-MISC { background-color: violet; }
+        .I-MISC { background-color: violet; }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        {% set ns = namespace(current_pos=0) %}
+        {% for entity in entities %}
+            <!-- Display text before the entity -->
+            {% if ns.current_pos < entity.start %}
+                {{ original_text[ns.current_pos:entity.start] | safe }}
+            {% endif %}
+            <!-- Highlight the entity -->
+            <span class="entity {{ entity.entity_type }}">{{ original_text[entity.start:entity.end] | safe }}</span>
+            {% set ns.current_pos = entity.end %}
+
+        {% endfor %}
+        <!-- Display the remaining text after the last entity -->
+        {{ original_text[ns.current_pos:] | safe }}
+        <br><br>
+        <span style="color: yellow;">
+        Estimated memory used: {{ memory_used | safe }} MB</span>
+        <br>
+        <span style="color: yellow;">
+        Elapsed time: {{ elapsed_time | safe }} seconds
+        </span>
+    </div>
+</body>
+</html>
+
+
